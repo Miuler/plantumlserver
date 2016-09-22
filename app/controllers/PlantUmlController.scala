@@ -3,21 +3,27 @@ package controllers
 import java.io.{ByteArrayOutputStream, File}
 import java.nio.file.attribute.FileTime
 import java.nio.file.{Files, Paths}
+import java.util.stream.Collectors
 import javax.inject.{Inject, Singleton}
 
 import net.sourceforge.plantuml.{FileFormat, FileFormatOption, SourceStringReader}
 import org.pegdown.PegDownProcessor
 import play.Configuration
 import play.api.Logger
-import play.api.cache.{CacheApi, Cached}
+import play.api.cache.{CacheApi, CacheManagerProvider, Cached}
 import play.api.mvc._
 import play.twirl.api.Html
+
+import scala.collection.JavaConversions._
 
 /**
   * Created by miuler on 9/21/16.
   */
 @Singleton
-class PlantUmlController @Inject() (cached: Cached, cacheApi: CacheApi, config: Configuration) extends Controller {
+class PlantUmlController @Inject()(cached: Cached,
+                                   cacheApi: CacheApi,
+                                   config: Configuration,
+                                   cacheManagerProvider: CacheManagerProvider) extends Controller {
 
   val logger = Logger(getClass)
   val root = config.getString("puml.root")
@@ -87,6 +93,18 @@ class PlantUmlController @Inject() (cached: Cached, cacheApi: CacheApi, config: 
       }
     }
   }
+
+  def umlRoot() = Action {
+    val readmePath = Paths.get(root)
+    val paths = Files.walk(readmePath, 1).collect(Collectors.toList()).toList.sortBy(_.getFileName)
+    Ok(views.html.root(paths))
+  }
+
+  def clean() = Action {
+    cacheManagerProvider.get.clearAll()
+    Ok("Cache borrado")
+  }
+
 }
 
 //trait AccessLogging {

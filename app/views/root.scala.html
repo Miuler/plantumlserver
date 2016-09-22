@@ -1,0 +1,16 @@
+@(paths:List[java.nio.file.Path])
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+  <ul>
+    @for(path <- paths) {
+      <li><a href="@path.getFileName">@path.getFileName</a></li>
+    }
+  </ul>
+</body>
+</html>
