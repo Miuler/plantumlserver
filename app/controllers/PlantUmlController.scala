@@ -10,7 +10,7 @@ import org.pegdown.PegDownProcessor
 import play.Configuration
 import play.api.Logger
 import play.api.cache.{CacheApi, Cached}
-import play.api.mvc.{Action, Controller}
+import play.api.mvc._
 import play.twirl.api.Html
 
 /**
@@ -89,3 +89,15 @@ class PlantUmlController @Inject() (cached: Cached, cacheApi: CacheApi, config: 
   }
 }
 
+//trait AccessLogging {
+//
+//  val accessLogger = Logger("access")
+//
+//  object Action extends ActionBuilder[Request] {
+//
+//    def invokeBlock[A](request: Request[A], block: (Request[A]) => Future[Result]) = {
+//      accessLogger.info(s"method=${request.method} uri=${request.uri} remote-address=${request.remoteAddress}")
+//      block(request)
+//    }
+//  }
+//}
