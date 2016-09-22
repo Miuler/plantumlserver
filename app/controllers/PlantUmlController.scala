@@ -6,18 +6,22 @@ import java.nio.file.{Files, Paths}
 import javax.inject.{Inject, Singleton}
 
 import net.sourceforge.plantuml.{FileFormat, FileFormatOption, SourceStringReader}
+import org.pegdown.PegDownProcessor
+import play.Configuration
 import play.api.Logger
 import play.api.cache.{CacheApi, Cached}
 import play.api.mvc.{Action, Controller}
+import play.twirl.api.Html
 
 /**
   * Created by miuler on 9/21/16.
   */
 @Singleton
-class PlantUmlController @Inject() (cached: Cached, cacheApi: CacheApi) extends Controller {
+class PlantUmlController @Inject() (cached: Cached, cacheApi: CacheApi, config: Configuration) extends Controller {
 
   val logger = Logger(getClass)
-  val root = "/home/miuler/"
+  val root = config.getString("puml.root")
+
 
   def uml(file:String) = {
     val fileUml = root + file
@@ -34,9 +38,7 @@ class PlantUmlController @Inject() (cached: Cached, cacheApi: CacheApi) extends 
     } else {
       if (!lastModifiedTime.equals(lastModifiedTimeCache.get)) {
         logger.info(s"clear cache")
-        logger.info(s"uml: ${cacheApi.get(fileUml)}")
         cacheApi.remove(fileUml)
-        logger.info(s"uml: ${cacheApi.get(fileUml)}")
         cacheApi.remove(fileUmlTime)
         logger.info(s"set time in cache $fileUmlTime: $lastModifiedTime")
         cacheApi.set(fileUmlTime, lastModifiedTime)
@@ -56,5 +58,34 @@ class PlantUmlController @Inject() (cached: Cached, cacheApi: CacheApi) extends 
     }
   }
 
+  def readme() = {
+    val readme = root + "README.md"
+    val readmeTime = readme + "lastModifiedTime"
+    val readmePath = Paths.get(readme)
+    val pegDownProcessor = new PegDownProcessor()
+    val readmeHtml = pegDownProcessor.markdownToHtml(new String(Files.readAllBytes(readmePath)))
+
+    val lastModifiedTime = Files.getLastModifiedTime(readmePath)
+    val lastModifiedTimeCache:Option[FileTime] = cacheApi.get(readmeTime)
+
+    if(lastModifiedTimeCache.isEmpty) {
+      logger.info(s"set time in cache $readmeTime: $lastModifiedTime")
+      cacheApi.set(readmeTime, lastModifiedTime)
+    } else {
+      if (!lastModifiedTime.equals(lastModifiedTimeCache.get)) {
+        logger.info(s"clear cache")
+        cacheApi.remove(readme)
+        cacheApi.remove(readmeTime)
+        logger.info(s"set time in cache $readmeTime: $lastModifiedTime")
+        cacheApi.set(readmeTime, lastModifiedTime)
+      }
+    }
+
+    cached(readme) {
+      Action {
+        Ok(views.html.readme(Html(readmeHtml)))
+      }
+    }
+  }
 }
 

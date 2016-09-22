@@ -14,4 +14,5 @@ libraryDependencies ++= Seq(
 )
 
 libraryDependencies += "net.sourceforge.plantuml" % "plantuml" % "8047"
+libraryDependencies += "org.pegdown" % "pegdown" % "1.6.0"
 

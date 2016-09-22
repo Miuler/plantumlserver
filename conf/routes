@@ -9,6 +9,8 @@ GET     /count                      controllers.CountController.count
 # An example controller showing how to write asynchronous code
 GET     /message                    controllers.AsyncController.message
 
+GET     /uml/README.md              controllers.PlantUmlController.readme()
+
 GET     /uml/*file                  controllers.PlantUmlController.uml(file)
 
 # Map static resources from the /public folder to the /assets URL path
