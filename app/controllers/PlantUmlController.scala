@@ -1,6 +1,6 @@
 package controllers
 
-import java.io.ByteArrayOutputStream
+import java.io.{ByteArrayOutputStream, File}
 import java.nio.file.attribute.FileTime
 import java.nio.file.{Files, Paths}
 import javax.inject.{Inject, Singleton}
@@ -47,7 +47,7 @@ class PlantUmlController @Inject() (cached: Cached, cacheApi: CacheApi) extends 
       Action {
         logger.info("new action")
         val puml = new String(Files.readAllBytes(fileUmlPath))
-        val sourceStringReader = new SourceStringReader(puml)
+        val sourceStringReader = new SourceStringReader(puml, new File(root))
         val outputStream = new ByteArrayOutputStream()
         val description = sourceStringReader.generateImage(outputStream, new FileFormatOption(FileFormat.SVG))
         outputStream.close()
