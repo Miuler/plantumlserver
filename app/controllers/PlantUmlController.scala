@@ -64,10 +64,10 @@ class PlantUmlController @Inject()(cached: Cached,
     }
   }
 
-  def readme() = {
-    val readme = root + "README.md"
-    val readmeTime = readme + "lastModifiedTime"
-    val readmePath = Paths.get(readme)
+  def readme(markdown:String) = {
+    val markdownUri = root + markdown
+    val readmeTime = markdownUri + "lastModifiedTime"
+    val readmePath = Paths.get(markdownUri)
     val pegDownProcessor = new PegDownProcessor()
     val readmeHtml = pegDownProcessor.markdownToHtml(new String(Files.readAllBytes(readmePath)))
 
@@ -80,24 +80,27 @@ class PlantUmlController @Inject()(cached: Cached,
     } else {
       if (!lastModifiedTime.equals(lastModifiedTimeCache.get)) {
         logger.info(s"clear cache")
-        cacheApi.remove(readme)
+        cacheApi.remove(markdownUri)
         cacheApi.remove(readmeTime)
         logger.info(s"set time in cache $readmeTime: $lastModifiedTime")
         cacheApi.set(readmeTime, lastModifiedTime)
       }
     }
 
-    cached(readme) {
+    cached(markdownUri) {
       Action {
         Ok(views.html.readme(Html(readmeHtml)))
       }
     }
   }
 
-  def umlRoot() = Action {
-    val readmePath = Paths.get(root)
-    val paths = Files.walk(readmePath, 1).collect(Collectors.toList()).toList.sortBy(_.getFileName)
-    Ok(views.html.root(paths))
+  def umlRoot(directory:String) = Action {
+    val directoryPath = Paths.get(root + directory)
+    val prePaths = Files.walk(directoryPath, 1).collect(Collectors.toList()).toList
+      .sortBy(_.getFileName)
+      .filter(_ != directoryPath)
+    val paths = (if(directory != "/") List(Paths.get(root + "/..")) else Nil) ++ prePaths
+    Ok(views.html.directory(paths))
   }
 
   def clean() = Action {

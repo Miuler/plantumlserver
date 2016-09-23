@@ -1,3 +1,4 @@
+@import java.nio.file.Files
 @(paths:List[java.nio.file.Path])
 
 <!DOCTYPE html>
@@ -9,7 +10,9 @@
 <body>
   <ul>
     @for(path <- paths) {
-      <li><a href="@path.getFileName">@path.getFileName</a></li>
+      @defining(if (Files.isDirectory(path)) path.getFileName + "/" else path.getFileName) { fileName =>
+        <li><a href="@fileName">@fileName</a></li>
+      }
     }
   </ul>
 </body>
