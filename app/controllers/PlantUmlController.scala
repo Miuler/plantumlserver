@@ -89,7 +89,7 @@ class PlantUmlController @Inject()(cached: Cached,
 
     cached(markdownUri) {
       Action {
-        Ok(views.html.readme(Html(readmeHtml)))
+        Ok(views.html.readme(markdown, Html(readmeHtml)))
       }
     }
   }
@@ -100,7 +100,7 @@ class PlantUmlController @Inject()(cached: Cached,
       .sortBy(_.getFileName)
       .filter(_ != directoryPath)
     val paths = (if(directory != "/") List(Paths.get(root + "/..")) else Nil) ++ prePaths
-    Ok(views.html.directory(paths))
+    Ok(views.html.directory(directory, paths))
   }
 
   def clean() = Action {
