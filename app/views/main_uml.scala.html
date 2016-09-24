@@ -1,4 +1,4 @@
-@(title:String, header:String)(content:Html)
+@(title:String, header:String, controls:Boolean = false)(content:Html)
 
 <!DOCTYPE html>
 <html lang="en">
@@ -13,6 +13,150 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
       <!-- Latest compiled and minified JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <style>
+    .pag {
+      margin: 0px !important;
+    }
+
+    .floatingHeader {
+      position: fixed;
+      top: 0;
+      visibility: hidden;
+      z-index: 1;
+      border: 1px solid #428bca;
+      border-radius: 0px;
+      -webkit-box-shadow: 0px 5px 10px #888888;
+      -moz-box-shadow: 0px 5px 10px #888888;
+      box-shadow: 0px 5px 10px #888888;
+    }
+
+    .absoluteHeader {
+      position: absolute;
+      z-index: 1;
+      visibility: hidden;
+      border: 1px solid #428bca;
+      border-bottom: 1px solid transparent;
+      border-bottom-right-radius: 3px;
+      border-bottom-left-radius: 3px;
+    }
+    </style>
+  </head>
+  <body>
+    <br/>
+    <div class="container">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <ul class="pager pag">
+            <li class="previous">
+              <a href="javascript:window.history.back()"><span aria-hidden="true">&larr;</span>Back</a>
+            </li>
+            <li class="previous">
+              <a id="refresh" href="#"><span class="glyphicon glyphicon-repeat" aria-hidden></span></a>
+            </li>
+            @if(controls) {
+            <li class="previous"><a id="zoom-in" onclick="zoomIn(event)" class="btn btn-default">Zoom in</a></li>
+            <li class="previous"><a id="zoom-out" onclick="zoomOut(event)" class="btn btn-default">Zoom out</a></li>
+            <li class="previous"><a id="reset" onclick="reset(event)" class="btn btn-default">Reset</a></li>
+            <input id="disable" type="checkbox" onclick="enableDisable(event)" checked><label for="disable">disable mouse</label>
+            }
+
+            <li class="next"><a id="clearcache" href="#">Clean Cache  <span class="glyphicon glyphicon-trash" aria-hidden></span></a></li>
+            <li>@header</li>
+          </ul>
+        </div>
+        <div class="panel-body">
+          @content
+        </div>
+        <div style="text-align: right" class="panel-footer">Powered by <a href="https://bitbucket.org/Miuler/plantuml-viewer">PlantUmlServer</a></div>
+      </div>
+    </div>
+
+
+    <script>
+      function UpdatePanelHeaders() {
+        $(".panel").each(function() {
+          var el         = $(this),
+            offset         = el.offset(),
+            scrollTop      = $(window).scrollTop(),
+            floatingHeader = $(".floatingHeader", this),
+            absoluteHeader = $(".absoluteHeader", this);
+
+          if ((scrollTop > offset.top) && (scrollTop < offset.top + (el.height() - floatingHeader.outerHeight(false))+4)) {
+            floatingHeader.css({
+              "visibility": "visible"
+            });
+            absoluteHeader.css({
+              "visibility": "hidden"
+            });
+          } else if (scrollTop  > (offset.top + el.height() - floatingHeader.outerHeight(false))) {
+            absoluteHeader.css({
+              "visibility": "visible",
+              "top": (el.height() + offset.top - floatingHeader.outerHeight(true) + 4 )
+            });
+            floatingHeader.css({
+              "visibility": "hidden"
+            });
+          } else {
+            floatingHeader.css({
+              "visibility": "hidden"
+            });
+            absoluteHeader.css({
+              "visibility": "hidden"
+            });
+          }
+        });
+      }
+
+      function loadPanelCopies() {
+        var clonedHeaderRow;
+        var secondClonedHeaderRow;
+
+        $(".panel").each(function() {
+          clonedHeaderRow = $(".panel-heading", this);
+          clonedHeaderRow
+            .before(clonedHeaderRow.clone())
+            .css("width", clonedHeaderRow.outerWidth())
+            .addClass("floatingHeader");
+
+          secondClonedHeaderRow = $(".floatingHeader", this);
+          secondClonedHeaderRow
+            .before(secondClonedHeaderRow.clone())
+            .css("width", secondClonedHeaderRow.outerWidth())
+            .removeClass("floatingHeader")
+            .addClass("absoluteHeader");
+        });
+      }
+
+      function reloadPanelCopies() {
+        $(".floatingHeader").remove();
+        $(".absoluteHeader").remove();
+        loadPanelCopies();
+      }
+
+      var delay = (function(){
+        var timer = 0;
+        return function(callback, ms){
+          clearTimeout (timer);
+          timer = setTimeout(callback, ms);
+        };
+      })();
+
+      $(document).ready(function(){
+
+        loadPanelCopies();
+        $(window).resize(function() {
+          delay(function(){
+            reloadPanelCopies();
+          }, 100);
+        });
+
+        $(window)
+          .scroll(UpdatePanelHeaders)
+          .trigger("scroll");
+
+      })
+    </script>
+
     <script>
       $(document).ready(function(){
         $("#clearcache").click(function (evn) {
@@ -41,33 +185,70 @@
         })
       })
     </script>
-    <style>
-    .pag {
-      margin: 0px !important;
+
+    @if(controls) {
+      <script src="@routes.Assets.versioned("javascripts/svg-pan-zoom_miuler.js")" type="text/javascript"></script>
+      <script src="@routes.Assets.versioned("javascripts/thumbnailViewer.js")" type="text/javascript"></script>
+      @*<script type="text/javascript">*@
+      @*thumbnailViewer({mainViewId: 'svg',thumbViewId: 'thumbView'});*@
+      @*</script>*@
+      <script>
+        var panZoom = null
+
+
+        function zoomIn(ev) {
+          ev.preventDefault()
+          panZoom.zoomIn()
+        };
+
+        function zoomOut(ev) {
+          ev.preventDefault()
+          panZoom.zoomOut()
+        };
+
+        function reset(ev) {
+          ev.preventDefault()
+          panZoom.resetZoom()
+          panZoom.resetPan()
+
+          $("input:checkbox").prop('checked', true);
+          panZoom.disablePan()
+          panZoom.disableZoom()
+          panZoom.disableDblClickZoom()
+          panZoom.disableMouseWheelZoom()
+          panZoom.disablePreventMouseEvents()
+        };
+
+        function enableDisable(ev) {
+          if (ev.target.checked) {
+            $("input:checkbox").prop('checked', true);
+            panZoom.disablePan()
+            panZoom.disableZoom()
+            panZoom.disableDblClickZoom()
+            panZoom.disableMouseWheelZoom()
+            panZoom.disablePreventMouseEvents()
+          } else {
+            $("input:checkbox").prop('checked', false);
+            panZoom.enablePan()
+            panZoom.enableZoom()
+            panZoom.enableDblClickZoom()
+            panZoom.enableMouseWheelZoom()
+            panZoom.enablePreventMouseEvents()
+          }
+        };
+
+        $(document).ready(function () {
+          panZoom = svgPanZoom('svg', {
+            zoomEnabled: false,
+            panEnabled: false,
+            dblClickZoomEnabled: false,
+            mouseWheelZoomEnabled: false,
+            preventMouseEventsDefault: false,
+            controlIconsEnabled: true
+          });
+
+        })
+      </script>
     }
-    </style>
-  </head>
-  <body>
-    <br/>
-    <div class="container">
-      <div class="panel panel-primary">
-        <div class="panel-heading">
-          <ul class="pager pag">
-            <li class="previous">
-              <a href="javascript:window.history.back()"><span aria-hidden="true">&larr;</span>Back</a>
-            </li>
-            <li class="previous">
-              <a id="refresh" href="#"><span class="glyphicon glyphicon-repeat" aria-hidden></span></a>
-            </li>
-            <li class="next"><a id="clearcache" href="#">Clean Cache  <span class="glyphicon glyphicon-trash" aria-hidden></span></a></li>
-            <li>@header</li>
-          </ul>
-        </div>
-        <div class="panel-body">
-          @content
-        </div>
-        <div style="text-align: right" class="panel-footer">Powered by <a href="https://bitbucket.org/Miuler/plantuml-viewer">PlantUmlServer</a></div>
-      </div>
-    </div>
   </body>
 </html>

@@ -1,6 +1,6 @@
 @(filename:String, puml:String)
 
-@main_uml(filename, filename) {
+@main_uml(filename, filename, true) {
   <style tyle="text/css">
   #mainViewContainer {
     width: 100%;
@@ -19,12 +19,12 @@
   }
   </style>
 
-  <div class="controls">
-    <button id="zoom-in" class="btn btn-default">Zoom in</button>
-    <button id="zoom-out" class="btn btn-default">Zoom out</button>
-    <button id="reset" class="btn btn-default">Reset</button>
-    <input id="disable" type="checkbox" checked><label for="disable">disable mouse</label>
-  </div>
+  @*<div class="controls">*@
+    @*<button id="zoom-in" class="btn btn-default">Zoom in</button>*@
+    @*<button id="zoom-out" class="btn btn-default">Zoom out</button>*@
+    @*<button id="reset" class="btn btn-default">Reset</button>*@
+    @*<input id="disable" type="checkbox" checked><label for="disable">disable mouse</label>*@
+  @*</div>*@
 
   <div id="mainViewContainer">
   @Html(puml)
@@ -32,61 +32,5 @@
 
 
 
-  <script src="@routes.Assets.versioned("javascripts/svg-pan-zoom_miuler.js")" type="text/javascript"></script>
-  <script src="@routes.Assets.versioned("javascripts/thumbnailViewer.js")" type="text/javascript"></script>
-  @*<script type="text/javascript">*@
-    @*thumbnailViewer({mainViewId: 'svg',thumbViewId: 'thumbView'});*@
-  @*</script>*@
-
-
-  <script>
-    var p = null
-    // Don't use window.onLoad like this in production, because it can only listen to one function.
-    $(document).ready(function() {
-      var panZoom = svgPanZoom('svg', {
-        zoomEnabled: false,
-        panEnabled: false,
-        dblClickZoomEnabled: false,
-        mouseWheelZoomEnabled: false,
-        preventMouseEventsDefault: false,
-        controlIconsEnabled: true
-      });
-
-      document.getElementById('zoom-in').addEventListener('click', function(ev){
-        ev.preventDefault()
-        panZoom.zoomIn()
-      });
-
-      document.getElementById('zoom-out').addEventListener('click', function(ev){
-        ev.preventDefault()
-        panZoom.zoomOut()
-      });
-
-      document.getElementById('reset').addEventListener('click', function(ev){
-        ev.preventDefault()
-        panZoom.resetZoom()
-        panZoom.resetPan()
-      });
-
-      document.getElementById('disable').addEventListener('click', function(ev) {
-        p = panZoom
-        console.log(panZoom.__proto__)
-        console.log(panZoom.prototype)
-        if (ev.target.checked) {
-          panZoom.disablePan()
-          panZoom.disableZoom()
-          panZoom.disableDblClickZoom()
-          panZoom.disableMouseWheelZoom()
-          panZoom.disablePreventMouseEvents()
-        } else {
-          panZoom.enablePan()
-          panZoom.enableZoom()
-          panZoom.enableDblClickZoom()
-          panZoom.enableMouseWheelZoom()
-          panZoom.enablePreventMouseEvents()
-        }
-      });
-    });
-  </script>
 }
 
