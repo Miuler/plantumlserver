@@ -54,13 +54,13 @@
               <a id="refresh" href="#" onclick="refresh(event)"><span class="glyphicon glyphicon-repeat" aria-hidden></span></a>
             </li>
             @if(controls) {
-            <li class="previous"><a id="zoom-in" onclick="zoomIn(event)" class="btn btn-default">Zoom in</a></li>
-            <li class="previous"><a id="zoom-out" onclick="zoomOut(event)" class="btn btn-default">Zoom out</a></li>
-            <li class="previous"><a id="reset" onclick="reset(event)" class="btn btn-default">Reset</a></li>
-            <input id="disable" type="checkbox" onclick="enableDisable(event)" checked><label for="disable">disable mouse</label>
+            <li class="previous"><a onclick="zoomIn(event)" class="btn btn-default">Zoom in</a></li>
+            <li class="previous"><a onclick="zoomOut(event)" class="btn btn-default">Zoom out</a></li>
+            <li class="previous"><a onclick="reset(event)" class="btn btn-default">Reset</a></li>
+            <input type="checkbox" onclick="enableDisable(event)" checked><label for="disable">disable mouse</label>
             }
 
-            <li class="next"><a id="clearcache" href="#">Clean Cache  <span class="glyphicon glyphicon-trash" aria-hidden></span></a></li>
+            <li class="next"><a onclick="clearCache(event)" href="#">Clean Cache  <span class="glyphicon glyphicon-trash" aria-hidden></span></a></li>
             <li>@header</li>
           </ul>
         </div>
@@ -172,19 +172,17 @@
         });
       }
 
-      $(document).ready(function(){
-        $("#clearcache").click(function (evn) {
-          evn.preventDefault()
-          console.log("clean cache")
-          $.ajax({
-            url: "/uml/clean"
-          }).done(function (data) {
-            console.log(data)
-            location.reload(true)
-          })
+      function clearCache(evn) {
+        evn.preventDefault()
+        console.log("clean cache")
+        $.ajax({
+          url: "/uml/clean"
+        }).done(function (data) {
+          console.log(data)
+          location.reload(true)
         })
+      }
 
-      })
     </script>
 
     @if(controls) {
