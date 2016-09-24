@@ -103,6 +103,7 @@ class PlantUmlController @Inject()(cached: Cached,
   }
 
   def clean() = Action {
+    logger.info("clean all cache")
     cacheManagerProvider.get.clearAll()
     Ok("Cache borrado")
   }

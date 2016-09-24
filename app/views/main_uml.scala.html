@@ -13,6 +13,20 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
       <!-- Latest compiled and minified JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script>
+      $(document).ready(function(){
+        $("#clearcache").click(function (evn) {
+          evn.preventDefault()
+          console.log("clean cache")
+          $.ajax({
+            url: "/uml/clean"
+          }).done(function (data) {
+            console.log(data)
+            location.reload(true)
+          })
+        })
+      })
+    </script>
     <style>
     .pag {
       margin: 0px !important;
@@ -28,6 +42,10 @@
             <li class="previous">
               <a href="javascript:window.history.back()"><span aria-hidden="true">&larr;</span>Back</a>
             </li>
+            <li class="previous">
+              <a href="javascript:location.reload(true);"><span class="glyphicon glyphicon-repeat" aria-hidden></span></a>
+            </li>
+            <li class="next"><a id="clearcache" href="#">Clean Cache  <span class="glyphicon glyphicon-trash" aria-hidden></span></a></li>
             <li>@header</li>
           </ul>
         </div>
