@@ -3,18 +3,32 @@
  * message to display.
  *@
 @(message: String)
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link href="https://fonts.googleapis.com/css?family=Indie+Flower" rel="stylesheet">
+    <style>
+      body {
+        background-image: url("@routes.Assets.versioned("images/play.jpg")");
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-position: center;
+      }
+      h1 {
+        text-align: center;
+        font-size: 102px;
+        font-family: 'Indie FLower', cursive;
+        color: white;
+        margin: 0px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>PlantUML - Server</h1>
+  </body>
+</html>
 
-@*
- * Call the `main` template with two arguments. The first
- * argument is a `String` with the title of the page, the second
- * argument is an `Html` object containing the body of the page.
- *@
-@main("Welcome to Play") {
-
-    @*
-     * Get an `Html` object by calling the built-in Play welcome
-     * template and passing a `String` message.
-     *@
-    @play20.welcome(message, style = "Scala")
-
-}
