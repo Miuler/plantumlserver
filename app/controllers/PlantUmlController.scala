@@ -28,8 +28,9 @@ class PlantUmlController @Inject()(cached: Cached,
   val root = config.getString("puml.root")
 
 
-  def uml(file:String) = {
+  def uml(file:String, bare:Boolean) = {
     val fileUml = root + file
+    val fileUmlKey = fileUml + bare
     val fileUmlTime = fileUml + "lastModifiedTime"
     logger.info(s"fileUml: ${fileUml}")
 
@@ -43,14 +44,14 @@ class PlantUmlController @Inject()(cached: Cached,
     } else {
       if (!lastModifiedTime.equals(lastModifiedTimeCache.get)) {
         logger.info(s"clear cache")
-        cacheApi.remove(fileUml)
+        cacheApi.remove(fileUmlKey)
         cacheApi.remove(fileUmlTime)
         logger.info(s"set time in cache $fileUmlTime: $lastModifiedTime")
         cacheApi.set(fileUmlTime, lastModifiedTime)
       }
     }
 
-    cached(fileUml) {
+    cached(fileUmlKey) {
       Action {
         logger.info("new action")
         val puml = new String(Files.readAllBytes(fileUmlPath))
@@ -58,7 +59,11 @@ class PlantUmlController @Inject()(cached: Cached,
         val outputStream = new ByteArrayOutputStream()
         val description = sourceStringReader.generateImage(outputStream, new FileFormatOption(FileFormat.SVG))
         outputStream.close()
-        Ok(views.html.puml(file, outputStream.toString()))
+        if (bare) {
+          Ok(outputStream.toString()).as("image/svg+xml")
+        } else {
+          Ok(views.html.puml(file, outputStream.toString()))
+        }
       }
     }
   }
@@ -108,6 +113,32 @@ class PlantUmlController @Inject()(cached: Cached,
     Ok("Cache borrado")
   }
 
+  def raw(path:String) = {
+    val fileKey = root + path
+    val _path = Paths.get(root + path)
+
+    val fileKeyTime = fileKey + "lastModifiedTime"
+
+    val lastModifiedTime = Files.getLastModifiedTime(_path)
+    val lastModifiedTimeCache:Option[FileTime] = cacheApi.get(fileKeyTime)
+
+    if(lastModifiedTimeCache.isEmpty) {
+      logger.info(s"set time in cache $fileKeyTime: $lastModifiedTime")
+      cacheApi.set(fileKeyTime, lastModifiedTime)
+    } else {
+      if (!lastModifiedTime.equals(lastModifiedTimeCache.get)) {
+        logger.info(s"clear cache")
+        cacheApi.remove(fileKey)
+        cacheApi.remove(fileKeyTime)
+        logger.info(s"set time in cache $fileKeyTime: $lastModifiedTime")
+        cacheApi.set(fileKeyTime, lastModifiedTime)
+      }
+    }
+
+    cached("raw" + fileKey) {
+      Action{Ok(new String(Files.readAllBytes(_path)))}
+    }
+  }
 }
 
 //trait AccessLogging {
