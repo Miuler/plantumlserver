@@ -56,13 +56,17 @@
             @if(controls) {
             <li class="previous"><a onclick="zoomIn(event)" class="btn btn-default"><span class="glyphicon glyphicon-zoom-in" aria-hidden></span></a></li>
             <li class="previous"><a onclick="zoomOut(event)" class="btn btn-default"><span class="glyphicon glyphicon-zoom-out" aria-hidden></span></a></li>
-            <li class="previous"><a href="?bare=true" class="btn btn-default">Bare</a></li>
             <li class="previous"><a onclick="reset(event)" class="btn btn-default">Reset</a></li>
             <label><input type="checkbox" onclick="enableDisable(event)" checked>disable mouse</label>
             }
 
             <li class="next"><a onclick="clearCache(event)" href="#">Clean Cache  <span class="glyphicon glyphicon-trash" aria-hidden></span></a></li>
-            <li class="next"><a onclick="raw(event)">Raw</a></li>
+            @if(!header.endsWith("/")) {
+              <li class="next"><a onclick="raw(event)">Raw</a></li>
+              @if(controls) {
+                <li class="next"><a href="?bare=true" >Bare</a></li>
+              }
+            }
             <li>@header</li>
           </ul>
         </div>
