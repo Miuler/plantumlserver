@@ -12,7 +12,6 @@ import play.Configuration
 import play.api.Logger
 import play.api.cache.{CacheApi, CacheManagerProvider, Cached}
 import play.api.mvc._
-import play.twirl.api.Html
 
 import scala.collection.JavaConversions._
 
@@ -59,7 +58,7 @@ class PlantUmlController @Inject()(cached: Cached,
         val outputStream = new ByteArrayOutputStream()
         val description = sourceStringReader.generateImage(outputStream, new FileFormatOption(FileFormat.SVG))
         outputStream.close()
-        Ok(outputStream.toString()).as("image/svg+xml")
+        Ok(views.html.puml(file, outputStream.toString()))
       }
     }
   }
@@ -89,18 +88,18 @@ class PlantUmlController @Inject()(cached: Cached,
 
     cached(markdownUri) {
       Action {
-        Ok(views.html.readme(markdown, Html(readmeHtml)))
+        Ok(views.html.markdown(markdown, readmeHtml))
       }
     }
   }
 
-  def umlRoot(directory:String) = Action {
+  def directory(directory:String) = Action {
     val directoryPath = Paths.get(root + directory)
     val prePaths = Files.walk(directoryPath, 1).collect(Collectors.toList()).toList
       .sortBy(_.getFileName)
       .filter(_ != directoryPath)
     val paths = (if(directory != "/") List(Paths.get(root + "/..")) else Nil) ++ prePaths
-    Ok(views.html.directory(directory, paths))
+    Ok(views.html.directory("." + directory, paths))
   }
 
   def clean() = Action {

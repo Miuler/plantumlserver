@@ -1,37 +1,13 @@
 @import java.nio.file.Files
 @(directory:String, paths:List[java.nio.file.Path])
 
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+@main_uml(directory, directory) {
+  <ul>
+  @for(path <- paths) {
+    @defining(if (Files.isDirectory(path)) path.getFileName + "/" else path.getFileName) { fileName =>
+      <li><a href="@fileName">@fileName</a></li>
+    }
+  }
+  </ul>
+}
 
-      <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-
-      <!-- Optional theme -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-
-      <!-- Latest compiled and minified JavaScript -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-  </head>
-  <body>
-    <br/>
-    <div class="container">
-      <div class="panel panel-default">
-        <div class="panel-heading">.@directory</div>
-        <div class="panel-body">
-          <ul>
-          @for(path <- paths) {
-            @defining(if (Files.isDirectory(path)) path.getFileName + "/" else path.getFileName) { fileName =>
-              <li><a href="@fileName">@fileName</a></li>
-            }
-          }
-          </ul>
-        </div>
-        <div style="text-align: right" class="panel-footer">Powered by <a href="https://bitbucket.org/Miuler/plantuml-viewer">PlantUmlServer</a></div>
-      </div>
-    </div>
-  </body>
-</html>
