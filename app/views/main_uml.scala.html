@@ -51,7 +51,7 @@
               <a href="javascript:window.history.back()"><span aria-hidden="true">&larr;</span>Back</a>
             </li>
             <li class="previous">
-              <a id="refresh" href="#"><span class="glyphicon glyphicon-repeat" aria-hidden></span></a>
+              <a id="refresh" href="#" onclick="refresh(event)"><span class="glyphicon glyphicon-repeat" aria-hidden></span></a>
             </li>
             @if(controls) {
             <li class="previous"><a id="zoom-in" onclick="zoomIn(event)" class="btn btn-default">Zoom in</a></li>
@@ -158,6 +158,20 @@
     </script>
 
     <script>
+      function refresh(evn) {
+        evn.preventDefault()
+        $.ajax({
+          url: window.location.href,
+          headers: {
+            "Pragma": "no-cache",
+            "Expires": -1,
+            "Cache-Control": "no-cache"
+          }
+        }).done(function () {
+          window.location.reload(true);
+        });
+      }
+
       $(document).ready(function(){
         $("#clearcache").click(function (evn) {
           evn.preventDefault()
@@ -170,19 +184,6 @@
           })
         })
 
-        $("#refresh").click(function(evn) {
-          evn.preventDefault()
-          $.ajax({
-            url: window.location.href,
-            headers: {
-              "Pragma": "no-cache",
-              "Expires": -1,
-              "Cache-Control": "no-cache"
-            }
-          }).done(function () {
-            window.location.reload(true);
-          });
-        })
       })
     </script>
 
