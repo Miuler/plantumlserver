@@ -11,7 +11,7 @@ GET     /message                    controllers.AsyncController.message
 
 GET     /uml/raw/$file<.*>          controllers.PlantUmlController.raw(file)
 GET     /uml$directory<.*/>         controllers.PlantUmlController.directory(directory)
-GET     /uml/$markdown<.*\.md>      controllers.PlantUmlController.readme(markdown)
+GET     /uml/$markdown<.*\.md>      controllers.PlantUmlController.markdown(markdown)
 GET     /uml/$puml<.*\.puml>        controllers.PlantUmlController.uml(puml, bare:Boolean ?= false)
 GET     /uml/clean                  controllers.PlantUmlController.clean()
 

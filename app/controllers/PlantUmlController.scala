@@ -7,7 +7,8 @@ import java.util.stream.Collectors
 import javax.inject.{Inject, Singleton}
 
 import net.sourceforge.plantuml.{FileFormat, FileFormatOption, SourceStringReader}
-import org.pegdown.PegDownProcessor
+import org.commonmark.parser.Parser
+import org.commonmark.renderer.html.HtmlRenderer
 import play.Configuration
 import play.api.Logger
 import play.api.cache.{CacheApi, CacheManagerProvider, Cached}
@@ -55,8 +56,13 @@ class PlantUmlController @Inject()(cached: Cached,
       Action {
         logger.info("new action")
         val puml = new String(Files.readAllBytes(fileUmlPath))
+        logger.info(s"puml: $puml")
+        logger.info(s"root + file: ${root + file}")
+        logger.info(s"Paths.get(root + file).getParent: ${Paths.get(root + file).getParent}")
         val sourceStringReader = new SourceStringReader(puml, Paths.get(root + file).getParent.toFile)
+        logger.info(s"sourceStringReader: $sourceStringReader")
         val outputStream = new ByteArrayOutputStream()
+        logger.info(s"outputStream: $outputStream")
         val description = sourceStringReader.generateImage(outputStream, new FileFormatOption(FileFormat.SVG))
         outputStream.close()
         if (bare) {
@@ -68,12 +74,11 @@ class PlantUmlController @Inject()(cached: Cached,
     }
   }
 
-  def readme(markdown:String) = {
+  def markdown(markdown:String) = {
     val markdownUri = root + markdown
     val readmeTime = markdownUri + "lastModifiedTime"
     val readmePath = Paths.get(markdownUri)
-    val pegDownProcessor = new PegDownProcessor()
-    val readmeHtml = pegDownProcessor.markdownToHtml(new String(Files.readAllBytes(readmePath)))
+//    val pegDownProcessor = new PegDownProcessor()
 
     val lastModifiedTime = Files.getLastModifiedTime(readmePath)
     val lastModifiedTimeCache:Option[FileTime] = cacheApi.get(readmeTime)
@@ -92,6 +97,12 @@ class PlantUmlController @Inject()(cached: Cached,
     }
 
     cached(markdownUri) {
+
+      //      val readmeHtml = pegDownProcessor.markdownToHtml(new String(Files.readAllBytes(readmePath)))
+      val parser = Parser.builder().build()
+      val node = parser.parse(new String(Files.readAllBytes(readmePath)))
+      val htmlRenderer = HtmlRenderer.builder().build()
+      val readmeHtml = htmlRenderer.render(node)
       Action {
         Ok(views.html.markdown(markdown, readmeHtml))
       }
