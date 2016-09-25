@@ -7,6 +7,10 @@ import java.util.stream.Collectors
 import javax.inject.{Inject, Singleton}
 
 import net.sourceforge.plantuml.{FileFormat, FileFormatOption, SourceStringReader}
+import org.commonmark.ext.autolink.AutolinkExtension
+import org.commonmark.ext.gfm.strikethrough.StrikethroughExtension
+import org.commonmark.ext.gfm.tables.TablesExtension
+import org.commonmark.ext.heading.anchor.HeadingAnchorExtension
 import org.commonmark.parser.Parser
 import org.commonmark.renderer.html.HtmlRenderer
 import play.Configuration
@@ -99,9 +103,16 @@ class PlantUmlController @Inject()(cached: Cached,
     cached(markdownUri) {
 
       //      val readmeHtml = pegDownProcessor.markdownToHtml(new String(Files.readAllBytes(readmePath)))
-      val parser = Parser.builder().build()
+      val extensions = List(
+        TablesExtension.create(),
+        AutolinkExtension.create(),
+        StrikethroughExtension.create(),
+        HeadingAnchorExtension.create()
+      )
+
+      val parser = Parser.builder().extensions(extensions).build()
       val node = parser.parse(new String(Files.readAllBytes(readmePath)))
-      val htmlRenderer = HtmlRenderer.builder().build()
+      val htmlRenderer = HtmlRenderer.builder().extensions(extensions).build()
       val readmeHtml = htmlRenderer.render(node)
       Action {
         Ok(views.html.markdown(markdown, readmeHtml))

@@ -16,4 +16,9 @@ libraryDependencies ++= Seq(
 libraryDependencies += "net.sourceforge.plantuml" % "plantuml" % "8047"
 //libraryDependencies += "org.pegdown" % "pegdown" % "1.6.0"
 libraryDependencies += "com.atlassian.commonmark" % "commonmark" % "0.7.0"
+libraryDependencies += "com.atlassian.commonmark" % "commonmark-ext-autolink" % "0.7.0"
+libraryDependencies += "com.atlassian.commonmark" % "commonmark-ext-gfm-tables" % "0.7.0"
+libraryDependencies += "com.atlassian.commonmark" % "commonmark-ext-gfm-strikethrough" % "0.7.0"
+libraryDependencies += "com.atlassian.commonmark" % "commonmark-ext-heading-anchor" % "0.7.0"
+
 
