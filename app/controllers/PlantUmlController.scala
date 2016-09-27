@@ -141,7 +141,7 @@ class PlantUmlController @Inject()(cached: Cached,
 
   def raw(path:String) = {
     val fileKey = root + URLDecoder.decode(path)
-    val _path = Paths.get(root + path)
+    val _path = Paths.get(root + URLDecoder.decode(path))
 
     val fileKeyTime = fileKey + "lastModifiedTime"
 
