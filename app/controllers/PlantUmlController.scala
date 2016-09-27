@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream
 import java.nio.file.attribute.FileTime
 import java.nio.file.{Files, Paths}
 import java.util.stream.Collectors
+import java.net.URLDecoder
 import javax.inject.{Inject, Singleton}
 
 import net.sourceforge.plantuml.{FileFormat, FileFormatOption, SourceStringReader}
@@ -34,7 +35,8 @@ class PlantUmlController @Inject()(cached: Cached,
 
 
   def uml(file:String, bare:Boolean) = {
-    val fileUml = root + file
+    val _file = URLDecoder.decode(file)
+    val fileUml = root + _file
     val fileUmlKey = fileUml + bare
     val fileUmlTime = fileUml + "lastModifiedTime"
     logger.info(s"fileUml: ${fileUml}")
@@ -61,9 +63,9 @@ class PlantUmlController @Inject()(cached: Cached,
         logger.info("new action")
         val puml = new String(Files.readAllBytes(fileUmlPath))
         logger.info(s"puml: $puml")
-        logger.info(s"root + file: ${root + file}")
-        logger.info(s"Paths.get(root + file).getParent: ${Paths.get(root + file).getParent}")
-        val sourceStringReader = new SourceStringReader(puml, Paths.get(root + file).getParent.toFile)
+        logger.info(s"root + file: ${root + _file}")
+        logger.info(s"Paths.get(root + file).getParent: ${Paths.get(root + _file).getParent}")
+        val sourceStringReader = new SourceStringReader(puml, Paths.get(root + _file).getParent.toFile)
         logger.info(s"sourceStringReader: $sourceStringReader")
         val outputStream = new ByteArrayOutputStream()
         logger.info(s"outputStream: $outputStream")
@@ -72,14 +74,15 @@ class PlantUmlController @Inject()(cached: Cached,
         if (bare) {
           Ok(outputStream.toString()).as("image/svg+xml")
         } else {
-          Ok(views.html.puml(file, outputStream.toString()))
+          Ok(views.html.puml(_file, outputStream.toString()))
         }
       }
     }
   }
 
   def markdown(markdown:String) = {
-    val markdownUri = root + markdown
+    val _markdown = URLDecoder.decode(markdown)
+    val markdownUri = root + _markdown
     val readmeTime = markdownUri + "lastModifiedTime"
     val readmePath = Paths.get(markdownUri)
 //    val pegDownProcessor = new PegDownProcessor()
@@ -115,18 +118,19 @@ class PlantUmlController @Inject()(cached: Cached,
       val htmlRenderer = HtmlRenderer.builder().extensions(extensions).build()
       val readmeHtml = htmlRenderer.render(node)
       Action {
-        Ok(views.html.markdown(markdown, readmeHtml))
+        Ok(views.html.markdown(_markdown, readmeHtml))
       }
     }
   }
 
   def directory(directory:String) = Action {
-    val directoryPath = Paths.get(root + directory)
+    val _directory = URLDecoder.decode(directory)
+    val directoryPath = Paths.get(root + _directory)
     val prePaths = Files.walk(directoryPath, 1).collect(Collectors.toList()).toList
       .sortBy(_.getFileName)
       .filter(_ != directoryPath)
-    val paths = (if(directory != "/") List(Paths.get(root + "/..")) else Nil) ++ prePaths
-    Ok(views.html.directory("." + directory, paths))
+    val paths = (if(_directory != "/") List(Paths.get(root + "/..")) else Nil) ++ prePaths
+    Ok(views.html.directory("." + _directory, paths))
   }
 
   def clean() = Action {
@@ -136,7 +140,7 @@ class PlantUmlController @Inject()(cached: Cached,
   }
 
   def raw(path:String) = {
-    val fileKey = root + path
+    val fileKey = root + URLDecoder.decode(path)
     val _path = Paths.get(root + path)
 
     val fileKeyTime = fileKey + "lastModifiedTime"
