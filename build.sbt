@@ -1,6 +1,6 @@
 name := """PlantUmlServer"""
 
-version := "1.0a1"
+version := "1.0a1-SNAPSHOT"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
